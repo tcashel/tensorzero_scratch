@@ -1,0 +1,176 @@
+# TensorZero Configuration
+# This configuration demonstrates multi-provider support with various LLM models
+
+# Basic chat completion function with multiple provider variants
+[functions.chat]
+type = "chat"
+
+# OpenAI variants
+[functions.chat.variants.gpt4]
+type = "chat_completion"
+model = "openai::gpt-4"
+
+[functions.chat.variants.gpt35]
+type = "chat_completion"
+model = "openai::gpt-3.5-turbo"
+
+# Anthropic variants
+[functions.chat.variants.claude3_opus]
+type = "chat_completion"
+model = "anthropic::claude-3-opus-20240229"
+
+[functions.chat.variants.claude3_sonnet]
+type = "chat_completion"
+model = "anthropic::claude-3-sonnet-20240229"
+
+# xAI variants
+[functions.chat.variants.grok]
+type = "chat_completion"
+model = "xai::grok-beta"
+
+# Advanced function with structured output
+[functions.analyze_sentiment]
+type = "json"
+schema = """
+{
+  "type": "object",
+  "properties": {
+    "sentiment": {
+      "type": "string",
+      "enum": ["positive", "negative", "neutral", "mixed"]
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "explanation": {
+      "type": "string"
+    }
+  },
+  "required": ["sentiment", "confidence", "explanation"]
+}
+"""
+
+[functions.analyze_sentiment.variants.gpt4_json]
+type = "chat_completion"
+model = "openai::gpt-4"
+system_template = """
+You are a sentiment analysis expert. Analyze the provided text and return a JSON response
+with the sentiment (positive, negative, neutral, or mixed), confidence score (0-1), 
+and a brief explanation.
+"""
+
+[functions.analyze_sentiment.variants.claude_json]
+type = "chat_completion"
+model = "anthropic::claude-3-opus-20240229"
+system_template = """
+You are a sentiment analysis expert. Analyze the provided text and return a JSON response
+with the sentiment (positive, negative, neutral, or mixed), confidence score (0-1), 
+and a brief explanation.
+"""
+
+# Code generation function
+[functions.generate_code]
+type = "chat"
+
+[functions.generate_code.variants.gpt4_code]
+type = "chat_completion"
+model = "openai::gpt-4"
+system_template = """
+You are an expert programmer. Generate clean, well-documented code based on the user's requirements.
+Include appropriate error handling and follow best practices for the requested language.
+"""
+
+[functions.generate_code.variants.claude_code]
+type = "chat_completion"
+model = "anthropic::claude-3-opus-20240229"
+system_template = """
+You are an expert programmer. Generate clean, well-documented code based on the user's requirements.
+Include appropriate error handling and follow best practices for the requested language.
+"""
+
+# Summarization function with different models
+[functions.summarize]
+type = "chat"
+
+[functions.summarize.variants.gpt35_summary]
+type = "chat_completion"
+model = "openai::gpt-3.5-turbo"
+system_template = """
+Provide a concise summary of the given text, capturing the main points and key insights.
+Keep the summary to 3-5 sentences unless otherwise specified.
+"""
+
+[functions.summarize.variants.claude_summary]
+type = "chat_completion"
+model = "anthropic::claude-3-sonnet-20240229"
+system_template = """
+Provide a concise summary of the given text, capturing the main points and key insights.
+Keep the summary to 3-5 sentences unless otherwise specified.
+"""
+
+# Multi-step reasoning function
+[functions.reason]
+type = "chat"
+
+[functions.reason.variants.gpt4_reasoning]
+type = "chat_completion"
+model = "openai::gpt-4"
+system_template = """
+You are a logical reasoning expert. Break down complex problems step by step,
+showing your reasoning process clearly. Consider multiple perspectives and potential edge cases.
+"""
+
+[functions.reason.variants.claude_reasoning]
+type = "chat_completion"
+model = "anthropic::claude-3-opus-20240229"
+system_template = """
+You are a logical reasoning expert. Break down complex problems step by step,
+showing your reasoning process clearly. Consider multiple perspectives and potential edge cases.
+"""
+
+# Creative writing function
+[functions.creative_write]
+type = "chat"
+
+[functions.creative_write.variants.gpt4_creative]
+type = "chat_completion"
+model = "openai::gpt-4"
+temperature = 0.8
+system_template = """
+You are a creative writer with a vivid imagination. Craft engaging, original content
+based on the user's prompt. Use descriptive language and compelling narratives.
+"""
+
+[functions.creative_write.variants.claude_creative]
+type = "chat_completion"
+model = "anthropic::claude-3-opus-20240229"
+temperature = 0.8
+system_template = """
+You are a creative writer with a vivid imagination. Craft engaging, original content
+based on the user's prompt. Use descriptive language and compelling narratives.
+"""
+
+# Quick response function optimized for speed
+[functions.quick_response]
+type = "chat"
+
+[functions.quick_response.variants.gpt35_quick]
+type = "chat_completion"
+model = "openai::gpt-3.5-turbo"
+max_tokens = 150
+
+[functions.quick_response.variants.claude_haiku]
+type = "chat_completion"
+model = "anthropic::claude-3-haiku-20240307"
+max_tokens = 150
+
+# Model routing configuration
+[model_routing]
+default_routing_strategy = "round_robin"
+
+# A/B test configuration
+[experiments.provider_comparison]
+variants = ["gpt4", "claude3_opus", "grok"]
+allocation = "uniform"  # Equal split between variants

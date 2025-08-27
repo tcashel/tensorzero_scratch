@@ -1,0 +1,3 @@
+[submodule "vendors/tensorzero"]
+	path = vendors/tensorzero
+	url = https://github.com/tensorzero/tensorzero.git

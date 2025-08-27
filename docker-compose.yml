@@ -1,0 +1,102 @@
+version: '3.8'
+
+services:
+  tensorzero-gateway:
+    image: tensorzero/gateway:latest
+    ports:
+      - "3000:3000"  # Gateway API port
+    environment:
+      - RUST_LOG=info
+      - TENSORZERO_CONFIG_PATH=/config/tensorzero.toml
+      - CLICKHOUSE_URL=http://clickhouse:8123/tensorzero
+      - CLICKHOUSE_USER=default
+      - CLICKHOUSE_PASSWORD=
+      # LLM Provider API Keys (set via .env file)
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - XAI_API_KEY=${XAI_API_KEY}
+    volumes:
+      - ./config:/config:ro
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  tensorzero-ui:
+    image: tensorzero/ui:latest
+    ports:
+      - "3001:3001"  # UI port
+    environment:
+      - TENSORZERO_GATEWAY_URL=http://tensorzero-gateway:3000
+      - CLICKHOUSE_URL=http://clickhouse:8123/tensorzero
+    depends_on:
+      - tensorzero-gateway
+      - clickhouse
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.3
+    ports:
+      - "8123:8123"  # HTTP port
+      - "9000:9000"  # Native port
+    environment:
+      - CLICKHOUSE_USER=default
+      - CLICKHOUSE_PASSWORD=
+      - CLICKHOUSE_DB=tensorzero
+      - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
+    volumes:
+      - clickhouse-data:/var/lib/clickhouse
+      - ./config/clickhouse-init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "clickhouse-client", "--query", "SELECT 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # Optional: PostgreSQL for advanced use cases
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=tensorzero
+      - POSTGRES_PASSWORD=tensorzero
+      - POSTGRES_DB=tensorzero
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    profiles:
+      - full  # Only start with --profile full
+
+  # Development tools
+  jupyter:
+    build:
+      context: .
+      dockerfile: Dockerfile.jupyter
+    ports:
+      - "8888:8888"
+    environment:
+      - TENSORZERO_GATEWAY_URL=http://tensorzero-gateway:3000
+      - JUPYTER_ENABLE_LAB=yes
+      # Pass through API keys
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - XAI_API_KEY=${XAI_API_KEY}
+    volumes:
+      - ./notebooks:/home/jovyan/work
+      - ./examples:/home/jovyan/examples:ro
+      - ./config:/home/jovyan/config:ro
+    depends_on:
+      - tensorzero-gateway
+    profiles:
+      - dev  # Only start with --profile dev
+
+volumes:
+  clickhouse-data:
+  postgres-data:
+
+networks:
+  default:
+    name: tensorzero-network
