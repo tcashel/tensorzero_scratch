@@ -40,6 +40,12 @@ TensorZero provides:
 - `docs/` - Reference documentation and learnings
 - `vendors/tensorzero/` - TensorZero source (submodule)
 
+## Services & Ports
+
+- **Gateway API**: http://localhost:3000
+- **TensorZero UI**: http://localhost:4000
+- **ClickHouse**: http://localhost:8123
+
 ## Available Tasks
 
 Run `poe` to see all available tasks:

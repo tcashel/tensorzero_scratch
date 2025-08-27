@@ -90,8 +90,16 @@ with TensorZeroGateway.build_embedded(
 
 ### ClickHouse Integration
 - All inferences stored in ClickHouse
+- Default credentials: `chuser`/`chpassword` (development)
+- Database: `tensorzero`
 - Enables analytics and optimization
 - Supports custom queries and dashboards
+
+### UI Access
+- TensorZero UI runs on port 4000 (updated from docs)
+- Access at http://localhost:4000
+- Shows inference history, metrics, and experiments
+- Real-time monitoring of gateway activity
 
 ### Metrics Collected
 - Latency (request, model, total)
@@ -99,6 +107,7 @@ with TensorZeroGateway.build_embedded(
 - Cost estimates
 - Error rates
 - A/B test results
+- Inference IDs for tracking
 
 ### Feedback Collection
 ```python
@@ -108,6 +117,20 @@ client.feedback(
     feedback={"score": 0.9, "helpful": True}
 )
 ```
+
+### Python Client Modes
+1. **Standalone Gateway**: Connects to running gateway service
+   ```python
+   client = TensorZeroGateway("http://localhost:3000")
+   ```
+
+2. **Embedded Gateway**: Runs gateway in-process (no separate service needed)
+   ```python
+   client = TensorZeroGateway.build_embedded(
+       clickhouse_url="http://chuser:chpassword@localhost:8123/tensorzero",
+       config_file="config/tensorzero.toml",
+   )
+   ```
 
 ## Experimentation
 
