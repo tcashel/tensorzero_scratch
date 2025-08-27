@@ -21,6 +21,10 @@ wheels/
 *.egg
 MANIFEST
 
+# uv
+.venv/
+uv.lock
+
 # Virtual environments
 venv/
 ENV/
