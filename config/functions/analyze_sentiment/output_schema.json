@@ -1,0 +1,22 @@
+{
+  "type": "object",
+  "properties": {
+    "sentiment": {
+      "type": "string",
+      "enum": ["positive", "negative", "neutral", "mixed"],
+      "description": "The overall sentiment of the text"
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Confidence score from 0 to 1"
+    },
+    "explanation": {
+      "type": "string",
+      "description": "Brief explanation of the sentiment classification"
+    }
+  },
+  "required": ["sentiment", "confidence", "explanation"],
+  "additionalProperties": false
+}

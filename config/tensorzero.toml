@@ -51,31 +51,21 @@ model = "openai::gpt-4o-mini"
 # Structured output function for sentiment analysis
 [functions.analyze_sentiment]
 type = "json"
-output_schema = '{"type": "object", "properties": {"sentiment": {"type": "string", "enum": ["positive", "negative", "neutral", "mixed"]}, "confidence": {"type": "number", "minimum": 0, "maximum": 1}, "explanation": {"type": "string"}}, "required": ["sentiment", "confidence", "explanation"]}'
+system_schema = "functions/analyze_sentiment/system_schema.json"
+output_schema = "functions/analyze_sentiment/output_schema.json"
 
 [functions.analyze_sentiment.variants.gpt4_json]
 type = "chat_completion"
 model = "openai::gpt-4"
-system_template = """
-You are a sentiment analysis expert. Analyze the provided text and return a JSON response
-with the sentiment (positive, negative, neutral, or mixed), confidence score (0-1), 
-and a brief explanation.
-"""
+system_template = "functions/analyze_sentiment/system_template.minijinja"
+json_mode = "strict"
 
 [functions.analyze_sentiment.variants.claude_json]
 type = "chat_completion"
 model = "anthropic::claude-3-opus-20240229"
-system_template = """
-You are a sentiment analysis expert. Analyze the provided text and return a JSON response
-with the sentiment (positive, negative, neutral, or mixed), confidence score (0-1), 
-and a brief explanation.
-"""
+system_template = "functions/analyze_sentiment/system_template.minijinja"
 
 [functions.analyze_sentiment.variants.grok3_json]
 type = "chat_completion"
 model = "xai::grok-3-mini"
-system_template = """
-You are a sentiment analysis expert. Analyze the provided text and return a JSON response
-with the sentiment (positive, negative, neutral, or mixed), confidence score (0-1), 
-and a brief explanation.
-"""
+system_template = "functions/analyze_sentiment/system_template.minijinja"
