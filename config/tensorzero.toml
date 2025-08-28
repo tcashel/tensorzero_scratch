@@ -27,10 +27,18 @@ max_tokens = 1000
 type = "chat_completion"
 model = "anthropic::claude-3-haiku-20240307"
 
-# xAI variants
-[functions.chat.variants.grok_beta]
+# xAI variants with latest models
+[functions.chat.variants.grok3_mini]
 type = "chat_completion"
-model = "xai::grok-beta"
+model = "xai::grok-3-mini"
+
+[functions.chat.variants.grok_code_fast]
+type = "chat_completion"
+model = "xai::grok-code-fast-1"
+
+[functions.chat.variants.grok4]
+type = "chat_completion"
+model = "xai::grok-4-0709"
 
 # Simple haiku generation function (from official example)
 [functions.generate_haiku]
@@ -39,3 +47,35 @@ type = "chat"
 [functions.generate_haiku.variants.gpt_4o_mini]
 type = "chat_completion"
 model = "openai::gpt-4o-mini"
+
+# Structured output function for sentiment analysis
+[functions.analyze_sentiment]
+type = "json"
+output_schema = '{"type": "object", "properties": {"sentiment": {"type": "string", "enum": ["positive", "negative", "neutral", "mixed"]}, "confidence": {"type": "number", "minimum": 0, "maximum": 1}, "explanation": {"type": "string"}}, "required": ["sentiment", "confidence", "explanation"]}'
+
+[functions.analyze_sentiment.variants.gpt4_json]
+type = "chat_completion"
+model = "openai::gpt-4"
+system_template = """
+You are a sentiment analysis expert. Analyze the provided text and return a JSON response
+with the sentiment (positive, negative, neutral, or mixed), confidence score (0-1), 
+and a brief explanation.
+"""
+
+[functions.analyze_sentiment.variants.claude_json]
+type = "chat_completion"
+model = "anthropic::claude-3-opus-20240229"
+system_template = """
+You are a sentiment analysis expert. Analyze the provided text and return a JSON response
+with the sentiment (positive, negative, neutral, or mixed), confidence score (0-1), 
+and a brief explanation.
+"""
+
+[functions.analyze_sentiment.variants.grok3_json]
+type = "chat_completion"
+model = "xai::grok-3-mini"
+system_template = """
+You are a sentiment analysis expert. Analyze the provided text and return a JSON response
+with the sentiment (positive, negative, neutral, or mixed), confidence score (0-1), 
+and a brief explanation.
+"""

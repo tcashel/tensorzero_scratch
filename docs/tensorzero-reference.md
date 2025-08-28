@@ -60,7 +60,9 @@ model = "openai::gpt-4o-mini"
 ### Supported Providers
 - **OpenAI**: GPT-4, GPT-3.5, etc.
 - **Anthropic**: Claude models
-- **xAI**: Grok models
+- **xAI**: Grok models (grok-3-mini, grok-code-fast-1, grok-4-0709)
+  - All Grok models support structured output, reasoning, and function calling
+  - grok-4-0790 supports image input + text output
 - **Azure OpenAI**: Enterprise deployments
 - **Google AI**: Gemini models
 - **AWS Bedrock**: Various models

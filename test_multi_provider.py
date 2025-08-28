@@ -35,7 +35,9 @@ def test_all_providers():
         ("claude3_opus", "Anthropic Claude 3 Opus"),
         ("claude3_sonnet", "Anthropic Claude 3 Sonnet"),
         ("claude3_haiku", "Anthropic Claude 3 Haiku"),
-        ("grok_beta", "xAI Grok Beta"),
+        ("grok3_mini", "xAI Grok-3 Mini"),
+        ("grok_code_fast", "xAI Grok Code Fast"),
+        ("grok4", "xAI Grok-4"),
     ]
     
     test_prompt = "Explain what TensorZero is in exactly one sentence."
@@ -79,12 +81,33 @@ def test_all_providers():
             })
             
         except Exception as e:
-            print(f"   ❌ Failed: {e}")
+            error_msg = str(e)
+            # Extract cleaner error message if it's a verbose error
+            if "TensorZeroError" in error_msg:
+                try:
+                    # Try to extract the actual error message
+                    import json
+                    error_start = error_msg.find('{"error":')
+                    if error_start != -1:
+                        error_json = json.loads(error_msg[error_start:error_msg.rfind('}')+1])
+                        if "error" in error_json:
+                            # Further parse nested errors
+                            inner_error = error_json["error"]
+                            if "Error 403 Forbidden" in inner_error:
+                                error_msg = "403 Forbidden (check API key/credits)"
+                            elif "max_tokens" in inner_error:
+                                error_msg = "max_tokens required in config"
+                            else:
+                                error_msg = inner_error.split(": ")[-1][:100]
+                except:
+                    pass
+            
+            print(f"   ❌ Failed: {error_msg}")
             results.append({
                 "variant": variant_name,
                 "provider": display_name,
                 "success": False,
-                "error": str(e)
+                "error": error_msg
             })
     
     # Summary
