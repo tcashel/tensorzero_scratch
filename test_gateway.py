@@ -23,7 +23,7 @@ def test_gateway():
     
     # Connect to gateway
     try:
-        client = TensorZeroGateway("http://localhost:3000")
+        client = TensorZeroGateway.build_http(gateway_url="http://localhost:3000")
         print("✅ Connected to gateway at localhost:3000")
     except Exception as e:
         print(f"❌ Failed to connect to gateway: {e}")

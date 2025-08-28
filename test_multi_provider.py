@@ -25,7 +25,7 @@ def test_all_providers():
         print(f"{status} {provider} API key: {'Set' if key else 'Missing'}")
     
     # Connect to gateway
-    client = TensorZeroGateway("http://localhost:3000")
+    client = TensorZeroGateway.build_http(gateway_url="http://localhost:3000")
     print("\n✅ Connected to gateway")
     
     # Test variants
