@@ -33,6 +33,28 @@ type = "chat_completion"
 model = "provider::model-name"
 ```
 
+## Configuration Gotchas (Lessons Learned)
+
+### Invalid Configuration Fields
+- ❌ `[experiments]` section is **not supported** in current version
+- ❌ `[model_routing]` section causes configuration errors
+- ✅ Keep configuration minimal and follow official examples
+
+### Working Configuration Pattern
+```toml
+# Minimal working configuration
+[functions.chat]
+type = "chat"
+
+[functions.chat.variants.gpt4]
+type = "chat_completion"
+model = "openai::gpt-4"
+
+[functions.chat.variants.gpt4_mini]
+type = "chat_completion"
+model = "openai::gpt-4o-mini"
+```
+
 ## Providers
 
 ### Supported Providers
@@ -121,7 +143,11 @@ client.feedback(
 ### Python Client Modes
 1. **Standalone Gateway**: Connects to running gateway service
    ```python
+   # Deprecated constructor (shows warning)
    client = TensorZeroGateway("http://localhost:3000")
+   
+   # Preferred method
+   client = TensorZeroGateway.build_http("http://localhost:3000")
    ```
 
 2. **Embedded Gateway**: Runs gateway in-process (no separate service needed)
@@ -131,6 +157,18 @@ client.feedback(
        config_file="config/tensorzero.toml",
    )
    ```
+
+### Response Format
+Responses include structured content:
+```python
+response = client.inference(function_name="chat", input={"messages": [...]})
+
+# Response attributes
+response.inference_id      # Unique identifier
+response.variant_name      # Which variant was used
+response.content          # List of Text objects
+response.content[0].text  # Actual text content
+```
 
 ## Experimentation
 

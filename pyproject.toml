@@ -92,7 +92,7 @@ typecheck = "mypy ."
 
 # TensorZero specific
 gateway = "docker compose up tensorzero-gateway -d"
-ui = {shell = "open http://localhost:3001 || xdg-open http://localhost:3001"}
+ui = {shell = "open http://localhost:4000 || xdg-open http://localhost:4000"}
 clickhouse = "docker compose up clickhouse -d"
 
 # Utility commands
