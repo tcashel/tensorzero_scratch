@@ -69,3 +69,16 @@ system_template = "functions/analyze_sentiment/system_template.minijinja"
 type = "chat_completion"
 model = "xai::grok-3-mini"
 system_template = "functions/analyze_sentiment/system_template.minijinja"
+
+# Feedback metrics configuration
+[metrics.user_rating]
+type = "float"
+optimize = "max"
+level = "inference"
+
+[metrics.helpful]
+type = "boolean"
+optimize = "max"
+level = "inference"
+
+# Note: 'comment' and 'demonstration' metrics are built-in and don't need explicit config
