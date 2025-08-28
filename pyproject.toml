@@ -84,8 +84,7 @@ notebook = "jupyter lab notebooks/"
 test = "pytest tests/ -v"
 lint = "ruff check ."
 format = [
-    {cmd = "black ."},
-    {cmd = "isort ."},
+    {cmd = "ruff format"},
     {cmd = "ruff check . --fix"},
 ]
 typecheck = "mypy ."
