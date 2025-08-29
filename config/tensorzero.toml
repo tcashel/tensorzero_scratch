@@ -70,6 +70,39 @@ type = "chat_completion"
 model = "xai::grok-3-mini"
 system_template = "functions/analyze_sentiment/system_template.minijinja"
 
+# Function with tool support for agents
+[functions.agent_chat]
+type = "chat"
+tools = ["calculator", "get_weather", "search_tensorzero_docs"]
+
+[functions.agent_chat.variants.gpt4]
+type = "chat_completion"
+model = "openai::gpt-4"
+
+[functions.agent_chat.variants.gpt4_mini]
+type = "chat_completion"
+model = "openai::gpt-4o-mini"
+
+[functions.agent_chat.variants.claude3_haiku]
+type = "chat_completion"
+model = "anthropic::claude-3-haiku-20240307"
+
+# Tool definitions
+[tools.calculator]
+description = "Safely evaluate a mathematical expression for calculations"
+parameters = "functions/calculator.json"
+strict = true
+
+[tools.get_weather]
+description = "Get weather information for a location"
+parameters = "functions/get_weather.json"
+strict = true
+
+[tools.search_tensorzero_docs]
+description = "Search TensorZero documentation for information"
+parameters = "functions/search_tensorzero_docs.json"
+strict = true
+
 # Feedback metrics configuration
 [metrics.user_rating]
 type = "float"

@@ -237,7 +237,65 @@ model = "google::gemini-pro"
 ## Integration Examples
 
 ### With LangGraph
-*To be documented after Phase 5 implementation*
+**Working Integration Pattern:**
+
+TensorZero handles tools differently from OpenAI:
+- **Configuration-based**: Tools are defined in `tensorzero.toml`, not sent in requests
+- **ToolCall objects**: TensorZero returns `ToolCall` objects instead of OpenAI's tool_calls format
+- **Structured responses**: Response content is a list of Text and ToolCall objects
+
+**Key Differences:**
+```python
+# ❌ OpenAI-style (doesn't work with TensorZero)
+input_data = {
+    "messages": messages,
+    "tools": tool_definitions  # Not supported
+}
+
+# ✅ TensorZero-style
+input_data = {
+    "messages": messages
+    # Tools configured in tensorzero.toml
+}
+
+# Handle ToolCall objects
+for content_block in response.content:
+    if isinstance(content_block, ToolCall):
+        # Process tool call
+        tool_name = content_block.name
+        tool_args = content_block.arguments
+```
+
+**Working Agent Example:**
+```python
+class SimpleTensorZeroAgent:
+    def chat(self, user_message: str):
+        response = client.inference(
+            function_name="agent_chat",  # Function with tools configured
+            input={"messages": [{"role": "user", "content": user_message}]}
+        )
+
+        # Process response content blocks
+        for content_block in response.content:
+            if isinstance(content_block, ToolCall):
+                # Handle tool call
+                pass
+            elif hasattr(content_block, 'text'):
+                # Handle text response
+                pass
+```
+
+**Configuration:**
+```toml
+[functions.agent_chat]
+type = "chat"
+tools = ["calculator", "get_weather", "search_tensorzero_docs"]
+
+[tools.calculator]
+description = "Safely evaluate mathematical expressions"
+parameters = "functions/calculator.json"
+strict = true
+```
 
 ### With Agno
 *To be documented after Phase 5 implementation*
@@ -249,11 +307,55 @@ model = "google::gemini-pro"
 2. **Invalid configuration**: Validate TOML syntax
 3. **Provider errors**: Verify API keys and quotas
 4. **High latency**: Check network and provider status
+5. **Tool calling errors**: See Tool Calling Issues section below
+
+### Tool Calling Issues
+**Error: "tools: unknown field `tools`, expected `system` or `messages`"**
+
+**Cause:** TensorZero doesn't support sending tools in the request payload like OpenAI does.
+
+**Solution:**
+1. **Configure tools in `tensorzero.toml`:**
+   ```toml
+   [functions.agent_chat]
+   type = "chat"
+   tools = ["calculator", "get_weather"]
+
+   [tools.calculator]
+   description = "Calculate mathematical expressions"
+   parameters = "functions/calculator.json"
+   strict = true
+   ```
+
+2. **Remove tools from request payload:**
+   ```python
+   # ❌ Wrong
+   input_data = {
+       "messages": messages,
+       "tools": tool_definitions  # Remove this
+   }
+
+   # ✅ Correct
+   input_data = {
+       "messages": messages
+       # Tools configured in tensorzero.toml
+   }
+   ```
+
+3. **Handle ToolCall objects in response:**
+   ```python
+   for content_block in response.content:
+       if isinstance(content_block, ToolCall):
+           tool_name = content_block.name
+           tool_args = content_block.arguments
+   ```
 
 ### Debug Tips
 1. Enable verbose logging
 2. Use TensorZero UI for request inspection
 3. Check ClickHouse for stored data
+4. Validate TOML configuration syntax
+5. Test with simple requests before adding tools
 4. Monitor Docker logs
 
 ## References

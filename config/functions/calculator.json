@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "description": "Safely evaluate a mathematical expression for calculations",
+  "properties": {
+    "expression": {
+      "type": "string",
+      "description": "A mathematical expression like '2 + 2' or '10 * 5'"
+    }
+  },
+  "required": ["expression"],
+  "additionalProperties": false
+}
